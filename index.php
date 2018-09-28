@@ -14,15 +14,37 @@ include 'include/index-logic.php'
 
         <div class="form-inline">
             <div class="form-group mb-2">
+                Ano letivo: 
+            </div>
+            <div class="form-group mb-2">
+                <select class="form-control" id="termSelect">
+                <option value="2018/2019">2018/2019</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-inline">
+            <div class="form-group mb-2">
+                Curso: 
+            </div>
+            <div class="form-group mb-2">
+                <select class="form-control" id="degreeSelect" onchange="degreeSelectedEvent();">
+                    <?php
+                        /*foreach ($degrees as &$value) {
+                            echo("<option value=\"" . $degree->id . "\">" . $value->acronym . " - " . $value->name . "</option>");
+                        }*/
+                    ?>
+                    <option disabled selected value style="display:none"> -- Escolha um curso -- </option>
+                    <option value="2761663971481">MEEC</option>
+                    <option value="2761663971466">MEC</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-inline">
+            <div class="form-group mb-2">
                 Escolha a cadeira a adicionar: 
             </div>
             <div class="form-group mb-2">
                 <select class="form-control" id="coursesSelect">
-                    <?php
-                        foreach ($courses_sorted as &$value) {
-                            echo("<option value=\"" . $value->id . "\">" . $value->acronym . " - " . $value->name . "</option>");
-                        }
-                    ?>
                 </select>
             </div>
             <button type="button" class="btn btn-secondary mb-2" onclick="addCourse();">Adicionar</button>
@@ -32,13 +54,13 @@ include 'include/index-logic.php'
 
         <div id="app">
             <ul class="list-group list-group-flush">
-                <li v-for="(course, index) in courses" class="list-group-item">
+                <li v-for="(course, index) in selectedCourses" class="list-group-item">
                     {{ course.acronym }} - {{ course.name }}  ({{ course.academicTerm }})<br>
                     <div v-for="load in course.loads" class="form-check form-check-inline">
                         <input class="form-check-input" type="checkbox" v-model="load.checked">
                         <label class="form-check-label">{{ load.text }}&emsp;</label>
                     </div>
-                    <button v-on:click="courses.splice(index, 1)" class="btn btn-outline-danger btn-sm">Remove</button>
+                    <button v-on:click="selectedCourses.splice(index, 1)" class="btn btn-outline-danger btn-sm">Remove</button>
                 </li>
             </ul>
         </div>
@@ -54,7 +76,7 @@ include 'include/index-logic.php'
     
 
     <script>
-        var courseList = <?=json_encode($courses);?>
+        //var courseList = <?/*=json_encode($courses);*/?>
     </script>
 
     <script src="a.js"></script>

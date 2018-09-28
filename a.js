@@ -1,10 +1,59 @@
 var app = new Vue({
     el: '#app',
     data: {
-        courses: []
+        selectedCourses: []
     }
 });
+var coursesSelect = document.getElementById("coursesSelect");
+var degreeSelect = document.getElementById("degreeSelect");
+var courseList = {};
 
+// https://stackoverflow.com/a/3364546
+function removeOptions(selectbox)
+{
+    var i;
+    for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+    {
+        selectbox.remove(i);
+    }
+}
+
+function addCourseToDropdown(course) {
+    var option = document.createElement("option");
+    option.text = course.acronym + " - " + course.name;
+    option.value = course.id;
+    coursesSelect.add(option);
+}
+
+/* When the user changes the selected degree */
+function degreeSelectedEvent() {
+    let degreeID = degreeSelect.options[degreeSelect.selectedIndex].value;
+
+    removeOptions(coursesSelect);
+
+    //Send a get request to fetch the list of courses respective to that degree
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4) {
+            if(xmlHttp.status == 200) {
+                courseList = JSON.parse(xmlHttp.responseText);
+
+                //Add all the courses for that degree to the dropdown box
+                for(let id in courseList) {
+                    addCourseToDropdown(courseList[id]);
+                }
+            } else {
+                console.error("Error!!");
+            }
+        }
+    }
+
+    xmlHttp.open("GET", "get-courses.php?id=" + degreeID, true);
+    xmlHttp.send(null);
+    //getCoursesForDegreeAndFillSelect(degreeID);
+}
+
+/* Returns the URL of the course */
 function getCourseURL(id)
 {
     var xmlHttp = new XMLHttpRequest();
@@ -13,6 +62,7 @@ function getCourseURL(id)
     return JSON.parse(xmlHttp.responseText).url;
 }
 
+/* Returns the couse loads(what kind of classes exist) */
 function getCourseLoads(id)
 {
     var xmlHttp = new XMLHttpRequest();
@@ -21,7 +71,6 @@ function getCourseLoads(id)
     return JSON.parse(xmlHttp.responseText).courseLoads;
 }
 
-var coursesSelect = document.getElementById("coursesSelect");
 
 //Converts a load name to the letters that it corresponds to
 // such as: PROBLEMS -> PB, TEORICA -> T
@@ -41,9 +90,9 @@ function courseLoadNameToLetter(name) {
 
 function isCourseInList(id)
 {
-    for(i in app.courses)
+    for(i in app.selectedCourses)
     {
-        if(app.courses[i].id == id)
+        if(app.selectedCourses[i].id == id)
         {
             return true;
         }
@@ -75,7 +124,7 @@ function addCourse()
         course.loads.push({text: loads[i].type, value: loadLetter, checked: true});
     }
 
-    app.courses.push(course);
+    app.selectedCourses.push(course);
 }
 
 //https://stackoverflow.com/a/38445519
@@ -97,9 +146,9 @@ function redirectPost(url, data) {
 function generateSchedules()
 {
     let data = {};
-    for(courseI in app.courses)
+    for(courseI in app.selectedCourses)
     {
-        let course = app.courses[courseI];
+        let course = app.selectedCourses[courseI];
         //Add the course URL
         data["course" + courseI] = course.url;
 

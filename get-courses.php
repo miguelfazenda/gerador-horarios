@@ -1,5 +1,8 @@
 <?php
-    /*function get_courses_for_degree($degree) {
+    /*  Returns a list of courses for a given degree.
+        Params: ID (degree id)
+    */
+    function get_courses_for_degree($degree) {
         $json = file_get_contents('https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees/' . $degree . '/courses?academicTerm=2018/2019');
         $courses = json_decode($json);
 
@@ -23,9 +26,11 @@
         return $sortArray;
     }
     
-    $degree = filter_var($_GET['deg'], FILTER_SANITIZE_NUMBER_INT);
+    $degree = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
 
     $courses = get_courses_for_degree($degree);
-    
-    $courses_sorted = sort_courses($courses);*/
+    $courses_sorted = sort_courses($courses);
+
+    header('Content-Type: application/json');
+    echo json_encode($courses);
 ?>
